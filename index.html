@@ -1,0 +1,92 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WEST.全曲データベース館 | ペペランド</title><style>
+:root{--blue:#2158aa;--light:#eaf3ff;--ink:#26354b}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,'Noto Sans JP',sans-serif;color:var(--ink);background:#f5f8fe}header{background:linear-gradient(120deg,#2158aa,#6a8fe0);color:white;padding:42px 18px;text-align:center}h1{font-size:clamp(1.5rem,5vw,2.4rem);margin:8px 0}header p{margin:8px 0}main{max-width:1080px;margin:0 auto;padding:20px 14px 60px}.card{background:white;border-radius:18px;padding:22px;margin:16px 0;box-shadow:0 5px 22px #23447a12}h2{font-size:1.3rem;margin:0 0 14px;color:#2454a0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}label{font-weight:650;font-size:.9rem;display:block}input,select,button{font:inherit}input,select{width:100%;padding:11px;border:1px solid #b8c9e3;border-radius:9px;background:white;margin-top:6px}button{border:0;border-radius:10px;padding:11px 16px;background:var(--blue);color:white;cursor:pointer;font-weight:700}button.secondary{background:#e5efff;color:#194a98}button:disabled{opacity:.5;cursor:default}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.muted{color:#61728c;font-size:.9rem}.tag{display:inline-block;background:#eaf2ff;color:#2255a3;border-radius:999px;padding:3px 9px;margin:3px 4px 0 0;font-size:.77rem}.song{border-top:1px solid #e5edf8;padding:13px 0}.song strong{font-size:1.03rem}.song a{color:#175cb4}.tieup{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}.tieup-item{font-size:.84rem;background:#f0f5fd;border-radius:7px;padding:4px 8px;color:#324c72}.tieup-kind{font-weight:700;color:#2454a0;margin-right:7px}.meta{font-size:.84rem;color:#586a83;margin-top:5px}.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.counter{font-weight:bold;color:#2454a0}.notice{background:#fff8dc;padding:12px;border-radius:10px;font-size:.88rem}.pill{background:#dcecff;color:#164c9a;border-radius:10px;padding:8px 12px;display:inline-block}.hidden{display:none}footer{text-align:center;color:#62748c;padding:18px;font-size:.82rem}.pagination{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0}.pagination button{min-width:90px}.pagination .muted{font-variant-numeric:tabular-nums}a{overflow-wrap:anywhere}
+
+.tabbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;border-bottom:2px solid #dfe8f6;padding-bottom:10px}.tab{background:#edf3fd;color:#31557f;border:2px solid transparent;padding:14px 8px;border-radius:12px;font-size:clamp(.82rem,2.8vw,1rem)}.tab.active{background:#2158aa;color:white;border-color:#2158aa}.tab:focus-visible{outline:3px solid #e4a82b;outline-offset:3px}.tieup{margin:5px 0 3px;font-size:.84rem;color:#586a83}.tieup-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 8px;line-height:1.45;margin:2px 0}.tieup-icon{flex:none;color:#61728c}.tieup-work{color:#40516b}.tieup-kind{font-size:.78rem;color:#2454a0;font-weight:650;margin-right:0}.tieup-row+.tieup-row{margin-top:2px}.hidden{display:none!important}@media(max-width:540px){.card{padding:16px}.top{flex-wrap:wrap}.tabbar{gap:5px}}
+</style></head><body><header><div>🎡 ペペランド</div><h1>🎵 WEST.全曲データベース館</h1><p>今日の気分から、まだ知らない一曲へ。</p><small>Ver.0.05.1 · ファン制作・非公式</small></header><main>
+<section class="card"><h2>🔎 曲名がわかる人はこちら</h2><label>曲名を検索<input id="keyword" type="search" placeholder="曲名・読み（ひらがな）などを入力"></label><p class="muted">曲名・曲名の読み・作品名・作詞・作曲・関連作品・歌詞キーワードも検索できます。</p></section>
+<section class="card"><h2>🌈 気分から探してみよう</h2><div id="filters" class="grid"></div><div class="actions"><button id="reset" class="secondary">条件をクリア</button></div><p class="muted">条件は組み合わせ可能。未分類の項目は今後追加されていきます。</p></section>
+<section class="card" id="browsePanel">
+<div class="tabbar" role="tablist" aria-label="表示する内容を選択">
+<button type="button" id="tabSongs" class="tab active" role="tab" aria-selected="true" aria-controls="songsPanel">📚 楽曲一覧</button>
+<button type="button" id="tabPlaylist" class="tab" role="tab" aria-selected="false" aria-controls="playlistPanel">🎲 おまかせプレイリスト</button>
+</div>
+<div id="songsPanel" role="tabpanel" aria-labelledby="tabSongs"><div class="top"><h2>📚 楽曲一覧</h2><span id="counter" class="counter" aria-live="polite"></span></div><div id="pagerTop" class="pagination"></div><div id="results"></div><div id="pagerBottom" class="pagination"></div></div>
+<div id="playlistPanel" role="tabpanel" aria-labelledby="tabPlaylist" class="hidden"><h2>🎲 おまかせプレイリスト</h2><p class="muted">上の検索条件に一致する楽曲から、ランダムに選曲します。</p><div class="grid"><label>指定方法<select id="mode"><option value="count">曲数で指定</option><option value="time">時間で指定</option></select></label><label id="countLabel">曲数<input id="count" type="number" min="1" max="100" value="10"></label><label id="timeLabel" class="hidden">目標時間（分）<input id="minutes" type="number" min="1" max="600" value="30"></label></div><div class="actions"><button id="generate">🎧 プレイリストを作る</button><button id="copy" class="secondary" disabled>曲名リストをコピー</button></div><p class="muted">同じ曲の異なる音源も別データとして扱います。時間指定は目標に近い長さを目指す目安です。</p><div id="playlist" aria-live="polite"></div></div>
+</section>
+<p class="notice">このサイトはファンが個人で制作した非公式の資料館です。WEST.および関連する公式団体とは関係ありません。楽曲の再生にはSpotifyをご利用ください。</p></main><footer>最終更新日：2026年11月1日 · ペペランド</footer>
+<script>
+const FIELDS=['歌唱形態','音源バージョン','メンバー関連','関連種別','作詞','作曲','曲調','雰囲気','時間帯','シーン','気分・目的','歌詞'];
+const LABELS={};
+const MEMBER_ORDER=['重岡','桐山','中間','神山','藤井','濵田','小瀧'];
+const MEMBER_COLORS={'重岡':['#d62728','#fff'],'桐山':['#ec7900','#fff'],'中間':['#f7d735','#242424'],'神山':['#168443','#fff'],'藤井':['#2361bb','#fff'],'濵田':['#7941aa','#fff'],'小瀧':['#ef91bb','#242424']};
+let songs=[],playlist=[],currentPage=1,activeTab='songs',playlistStale=false;const PAGE_SIZE=30;const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const split=s=>String(s||'').split(',').map(v=>v.trim()).filter(Boolean);
+const duration=s=>{let n=Number(s['長さ(ms)']);if(n>0)return Math.round(n/1000);let a=(s['長さ']||'').split(':').map(Number);return a.length===2?a[0]*60+a[1]:0};
+const fmt=seconds=>`${Math.floor(seconds/60)}分${String(seconds%60).padStart(2,'0')}秒`;
+const optionsFor=key=>{let vals=[...new Set(songs.flatMap(s=>split(s[key])))];return key==='メンバー関連'?MEMBER_ORDER.filter(v=>vals.includes(v)):vals.sort((a,b)=>a.localeCompare(b,'ja'))};
+function makeFilters(){const host=$('filters');host.innerHTML='';FIELDS.forEach((key,i)=>{const label=document.createElement('label');label.textContent=LABELS[key]||key;const select=document.createElement('select');select.id='f'+i;select.innerHTML='<option value="">すべて</option>'+optionsFor(key).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');select.addEventListener('change',()=>filtersChanged());label.append(select);host.append(label)})}
+function matches(){const q=$('keyword').value.trim().toLocaleLowerCase();return songs.filter(s=>(!q||['曲名','作品名','作詞','作曲','関連作品・CM','歌詞','曲名の読み'].some(k=>String(s[k]||'').toLocaleLowerCase().includes(q)))&&FIELDS.every((k,i)=>{const v=$('f'+i).value;return !v||split(s[k]).includes(v)}))}
+function songHtml(s,i){
+ const tags=['歌唱形態','音源バージョン','メンバー関連','雰囲気','気分・目的'].flatMap(k=>split(s[k]).map(v=>{
+  const color=k==='メンバー関連'?MEMBER_COLORS[v]:null;
+  const style=color?` style="background:${color[0]};color:${color[1]}"`:'';
+  return `<span class="tag"${style}>${esc(v)}</span>`;
+ })).join('');
+ const url=/^https:\/\/open\.spotify\.com\//.test(s['曲Spotify URL']||'')?s['曲Spotify URL']:'';
+ const works=split(s['関連作品・CM']);const kinds=split(s['関連種別']);
+ const tieup=works.length?`<div class="tieup">${works.map((w,j)=>`<div class="tieup-row"><span class="tieup-icon" aria-hidden="true">🎬</span><span class="tieup-work">${esc(w)}</span>${kinds[j]?`<span class="tieup-kind">（${esc(kinds[j])}）</span>`:''}</div>`).join('')}</div>`:'';
+ return `<div class="song"><div class="top"><strong>${i+1}. ${esc(s['曲名'])}</strong><span class="muted">${esc(s['長さ']||fmt(duration(s)))}</span></div>${tieup}<div class="meta">${esc(s['作品名'])} · ${esc(s['発売日'])}</div><div>${tags}</div>${url?`<div class="meta"><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Spotifyで聴く ↗</a></div>`:''}</div>`;
+}
+function render(resetPage=false){
+ if(resetPage)currentPage=1;
+ const found=matches(),totalPages=Math.max(1,Math.ceil(found.length/PAGE_SIZE));
+ currentPage=Math.min(currentPage,totalPages);
+ const start=(currentPage-1)*PAGE_SIZE;
+ $('counter').textContent=found.length?`${songs.length}曲中、検索結果 ${found.length}曲（${start+1}〜${Math.min(start+PAGE_SIZE,found.length)}曲目）`:`検索結果 0 / ${songs.length}曲`;
+ $('results').innerHTML=found.length?found.slice(start,start+PAGE_SIZE).map((s,i)=>songHtml(s,start+i)).join(''):'<p class="muted">該当する曲はありません。</p>';
+ for(const id of ['pagerTop','pagerBottom']){
+  const el=$(id);el.innerHTML='';
+  if(!found.length||totalPages===1)continue;
+  const prev=document.createElement('button');prev.className='secondary';prev.textContent='← 前へ';prev.disabled=currentPage===1;
+  const info=document.createElement('span');info.className='muted';info.textContent=`${currentPage} / ${totalPages}ページ`;
+  const next=document.createElement('button');next.className='secondary';next.textContent='次へ →';next.disabled=currentPage===totalPages;
+  prev.addEventListener('click',()=>changePage(-1));next.addEventListener('click',()=>changePage(1));el.append(prev,info,next);
+ }
+}
+function changePage(delta){currentPage+=delta;render();$('browsePanel').scrollIntoView({behavior:'smooth',block:'start'})}
+function shuffled(arr){let a=arr.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function showTab(which,scroll=false){
+ activeTab=which;
+ $('songsPanel').classList.toggle('hidden',which!=='songs');$('playlistPanel').classList.toggle('hidden',which!=='playlist');
+ for(const [name,id] of [['songs','tabSongs'],['playlist','tabPlaylist']]){const btn=$(id);btn.classList.toggle('active',which===name);btn.setAttribute('aria-selected',String(which===name));}
+ if(scroll)$('browsePanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function filtersChanged(){render(true);playlistStale=playlist.length>0;if(playlistStale&&$('playlistStatus')){$('playlistStatus').textContent='検索条件が変更されました。新しい条件で作り直すには「プレイリストを作る」を押してください。';}showTab('songs');}
+function generate(){
+ const pool=shuffled(matches());
+ if(!pool.length){playlist=[];$('copy').disabled=true;$('playlist').innerHTML='<p class="notice">条件に合う楽曲がありません。</p>';return;}
+ let selected=[];
+ if($('mode').value==='count'){const n=Math.min(100,Math.max(1,Number($('count').value)||10));selected=pool.slice(0,n)}
+ else{const target=Math.min(600,Math.max(1,Number($('minutes').value)||30))*60;let total=0;for(const s of pool){const d=duration(s);if(!d)continue;if(selected.length===0||Math.abs(target-(total+d))<=Math.abs(target-total)){selected.push(s);total+=d}else if(total>=target)break}if(!selected.length)selected=[pool[0]]}
+ playlist=selected;playlistStale=false;const total=selected.reduce((n,s)=>n+duration(s),0);
+ $('playlist').innerHTML=`<p class="pill">🎶 ${selected.length}曲 · 合計 ${fmt(total)}</p><p id="playlistStatus" class="muted"></p>`+selected.map(songHtml).join('');$('copy').disabled=false;
+}
+$('tabSongs').addEventListener('click',()=>showTab('songs'));
+$('tabPlaylist').addEventListener('click',()=>showTab('playlist'));
+$('mode').addEventListener('change',()=>{$('countLabel').classList.toggle('hidden',$('mode').value!=='count');$('timeLabel').classList.toggle('hidden',$('mode').value!=='time')});$('keyword').addEventListener('input',filtersChanged);$('reset').addEventListener('click',()=>{$('keyword').value='';FIELDS.forEach((_,i)=>$('f'+i).value='');filtersChanged()});$('generate').addEventListener('click',generate);$('copy').addEventListener('click',async()=>{const str=playlist.map((s,i)=>`${i+1}. ${s['曲名']}（${s['長さ']}）`).join('\n');try{await navigator.clipboard.writeText(str);$('copy').textContent='コピーしました！';setTimeout(()=>$('copy').textContent='曲名リストをコピー',1800)}catch(e){window.prompt('コピーしてください',str)}});
+async function loadSongs(){
+ try{
+  const response=await fetch('./songs.json',{cache:'no-store'});
+  if(!response.ok)throw new Error(`HTTP ${response.status}`);
+  const data=await response.json();
+  if(!Array.isArray(data))throw new Error('JSON形式が正しくありません');
+  songs=data;makeFilters();render();
+ }catch(error){
+  console.error('楽曲データ読み込み失敗:',error);
+  $('counter').textContent='読み込みエラー';
+  $('results').innerHTML='<p class="notice">楽曲データを読み込めませんでした。index.htmlとsongs.jsonが同じ階層にあるか確認してください。GitHub Pages公開後は数分待って再読み込みしてください。</p>';
+ }
+}
+loadSongs();
+</script></body></html>
